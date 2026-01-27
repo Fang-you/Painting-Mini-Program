@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>创建图片</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#0052d9',
+                        'primary-light': '#ecf2fe',
+                        'td-gray': {
+                            100: '#f3f3f3',
+                            200: '#eeeeee',
+                            300: '#e7e7e7',
+                            400: '#dcdcdc',
+                            500: '#c5c5c5',
+                            600: '#a6a6a6',
+                            700: '#8b8b8b',
+                            800: '#777777',
+                            900: '#5e5e5e',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background-color: #f5f5f5;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+        .safe-area-top {
+            height: 54px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        .tab-bar {
+            position: fixed;
+            bottom: 0;
+            left: 0;
+            right: 0;
+            height: 83px;
+            background: #fff;
+            border-top: 1px solid #e7e7e7;
+            padding-bottom: 34px;
+        }
+        .generate-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            transition: all 0.3s ease;
+        }
+        .generate-btn:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.4);
+        }
+        .generate-btn:active {
+            transform: translateY(0);
+        }
+        .publish-btn {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+        }
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+        .loading-animation {
+            animation: pulse 1.5s ease-in-out infinite;
+        }
+        @keyframes spin {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        .spin {
+            animation: spin 1s linear infinite;
+        }
+    </style>
+</head>
+<body>
+    <!-- 安全区域 + 顶部栏 -->
+    <div class="safe-area-top flex items-end justify-center pb-2 relative">
+        <button class="absolute left-4 bottom-2 text-white">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 19l-7-7 7-7"/>
+            </svg>
+        </button>
+        <h1 class="text-white text-lg font-semibold">创建图片</h1>
+    </div>
+
+    <!-- 内容区域 -->
+    <div class="p-4 pb-24">
+        <!-- 提示词输入框 -->
+        <div class="bg-white rounded-xl p-4 shadow-sm mb-4">
+            <label class="block text-sm font-medium text-td-gray-900 mb-2">描述你想画的画面</label>
+            <textarea 
+                class="w-full h-32 p-3 border border-td-gray-300 rounded-lg text-sm resize-none focus:outline-none focus:border-primary focus:ring-1 focus:ring-primary"
+                placeholder="请输入你想画的画面描述&#10;例如：夕阳下的赛博城市，霓虹灯，未来风"
+            >夕阳下的赛博城市，霓虹灯闪烁，未来科技风格</textarea>
+        </div>
+
+        <!-- 生成按钮 -->
+        <button class="generate-btn w-full py-3 rounded-xl text-white font-medium text-base mb-6">
+            ✨ 生成图片
+        </button>
+
+        <!-- 加载状态（示例展示） -->
+        <div class="bg-white rounded-xl p-6 shadow-sm mb-4 hidden" id="loading-state">
+            <div class="flex flex-col items-center justify-center py-8">
+                <div class="w-12 h-12 border-4 border-primary border-t-transparent rounded-full spin mb-4"></div>
+                <p class="text-td-gray-700 loading-animation">AI正在作画中…</p>
+            </div>
+        </div>
+
+        <!-- 生成结果区 -->
+        <div class="bg-white rounded-xl overflow-hidden shadow-sm">
+            <div class="p-3 border-b border-td-gray-200">
+                <span class="text-sm font-medium text-td-gray-900">生成结果</span>
+            </div>
+            <!-- 大图预览 -->
+            <div class="relative">
+                <img src="https://picsum.photos/400/400?random=10" alt="生成的AI画作" class="w-full aspect-square object-cover">
+                <div class="absolute top-3 right-3 bg-black/50 text-white text-xs px-2 py-1 rounded-full">
+                    AI生成
+                </div>
+            </div>
+            <!-- 提示词文本 -->
+            <div class="p-4">
+                <div class="text-xs text-td-gray-600 mb-1">提示词</div>
+                <p class="text-sm text-td-gray-900 leading-relaxed">夕阳下的赛博城市，霓虹灯闪烁，未来科技风格</p>
+            </div>
+            <!-- 发布按钮 -->
+            <div class="p-4 pt-0">
+                <button class="publish-btn w-full py-3 rounded-xl text-white font-medium text-base">
+                    🚀 发布到广场
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 底部Tab栏 -->
+    <div class="tab-bar flex items-start justify-around pt-2">
+        <div class="flex flex-col items-center gap-1">
+            <svg class="w-6 h-6 text-td-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"/>
+            </svg>
+            <span class="text-xs text-td-gray-600">首页</span>
+        </div>
+        <div class="flex flex-col items-center gap-1">
+            <svg class="w-6 h-6 text-td-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"/>
+            </svg>
+            <span class="text-xs text-td-gray-600">我的</span>
+        </div>
+    </div>
+</body>
+</html>

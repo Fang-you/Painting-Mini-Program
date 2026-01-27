@@ -1,0 +1,136 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI画画 - 小程序原型</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px;
+        }
+        .phone-container {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 40px;
+            justify-content: center;
+            align-items: flex-start;
+        }
+        .phone-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .phone-label {
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            margin-bottom: 12px;
+            text-shadow: 0 2px 4px rgba(0,0,0,0.2);
+        }
+        .phone-frame {
+            width: 393px;
+            height: 852px;
+            background: #1a1a1a;
+            border-radius: 55px;
+            padding: 12px;
+            box-shadow: 
+                0 0 0 3px #2a2a2a,
+                0 25px 50px -12px rgba(0, 0, 0, 0.5),
+                inset 0 0 0 2px #3a3a3a;
+            position: relative;
+        }
+        .phone-frame::before {
+            content: '';
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 126px;
+            height: 34px;
+            background: #1a1a1a;
+            border-radius: 20px;
+            z-index: 10;
+        }
+        .phone-screen {
+            width: 100%;
+            height: 100%;
+            border-radius: 44px;
+            overflow: hidden;
+            background: #fff;
+        }
+        .phone-screen iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+        }
+        .page-title {
+            text-align: center;
+            color: white;
+            font-size: 32px;
+            font-weight: 700;
+            margin-bottom: 40px;
+            text-shadow: 0 4px 8px rgba(0,0,0,0.3);
+        }
+        .page-subtitle {
+            text-align: center;
+            color: rgba(255,255,255,0.8);
+            font-size: 16px;
+            margin-bottom: 50px;
+        }
+    </style>
+</head>
+<body>
+    <h1 class="page-title">AI画画 小程序原型</h1>
+    <p class="page-subtitle">基于 TDesign 设计风格 · iPhone 15 Pro 尺寸模拟</p>
+    
+    <div class="phone-container">
+        <!-- 首页 -->
+        <div class="phone-wrapper">
+            <div class="phone-label">首页 - AI画作广场</div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <iframe src="home.html"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 创建图片页 -->
+        <div class="phone-wrapper">
+            <div class="phone-label">创建图片</div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <iframe src="create.html"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的页面 - 已登录 -->
+        <div class="phone-wrapper">
+            <div class="phone-label">我的 - 已登录</div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <iframe src="profile.html"></iframe>
+                </div>
+            </div>
+        </div>
+        
+        <!-- 我的页面 - 未登录 -->
+        <div class="phone-wrapper">
+            <div class="phone-label">我的 - 未登录</div>
+            <div class="phone-frame">
+                <div class="phone-screen">
+                    <iframe src="profile-unlogged.html"></iframe>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
