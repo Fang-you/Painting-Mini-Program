@@ -1,0 +1,90 @@
+<!--profile.wxml-->
+<view class="page-container">
+  <!-- 用户信息区 -->
+  <view class="user-section">
+    <!-- 已登录状态 -->
+    <block wx:if="{{isLoggedIn}}">
+      <view class="user-info">
+        <view class="avatar-wrapper">
+          <view class="avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+            <text class="avatar-text">{{userInfo.nickName[0] || '用'}}</text>
+          </view>
+        </view>
+        <view class="user-detail">
+          <text class="nickname">{{userInfo.nickName}}</text>
+          <text class="work-count">已创作 {{artworks.length}} 幅作品</text>
+        </view>
+        <view class="settings-btn" bindtap="onSettingsTap">
+          <t-icon name="setting" size="48rpx" color="#8b8b8b" />
+        </view>
+      </view>
+    </block>
+
+    <!-- 未登录状态 -->
+    <block wx:else>
+      <view class="unlogged-info">
+        <view class="default-avatar">
+          <t-icon name="user" size="80rpx" color="#c5c5c5" />
+        </view>
+        <text class="unlogged-title">未登录</text>
+        <text class="unlogged-tip">登录后可管理您的AI画作</text>
+        <t-button 
+          theme="primary" 
+          size="large" 
+          class="wechat-login-btn"
+          bind:tap="onWechatLogin"
+        >
+          <t-icon name="logo-wechat" size="40rpx" />
+          微信一键登录
+        </t-button>
+      </view>
+    </block>
+  </view>
+
+  <!-- 个人画廊 -->
+  <view class="gallery-section">
+    <view class="gallery-header">
+      <text class="gallery-title">个人画廊</text>
+      <text class="gallery-count" wx:if="{{isLoggedIn}}">共 {{artworks.length}} 幅</text>
+    </view>
+
+    <!-- 已登录且有作品 -->
+    <view class="gallery-grid" wx:if="{{isLoggedIn && artworks.length > 0}}">
+      <view 
+        class="gallery-item" 
+        wx:for="{{artworks}}" 
+        wx:key="id"
+        bindtap="onArtworkTap"
+        data-index="{{index}}"
+      >
+        <image class="gallery-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
+      </view>
+    </view>
+
+    <!-- 已登录但无作品 -->
+    <view class="empty-state" wx:if="{{isLoggedIn && artworks.length === 0}}">
+      <view class="empty-icon">
+        <t-icon name="image" size="80rpx" color="#c5c5c5" />
+      </view>
+      <text class="empty-title">暂无作品</text>
+      <text class="empty-tip">快去创作你的第一幅AI画作吧</text>
+      <t-button 
+        theme="primary" 
+        size="medium" 
+        class="create-btn"
+        bind:tap="onCreateTap"
+      >
+        开始创作
+      </t-button>
+    </view>
+
+    <!-- 未登录状态 -->
+    <view class="empty-state" wx:if="{{!isLoggedIn}}">
+      <view class="empty-icon">
+        <t-icon name="image" size="80rpx" color="#c5c5c5" />
+      </view>
+      <text class="empty-title">请登录查看您的个人画廊</text>
+      <text class="empty-tip">登录后即可查看和管理您创作的所有AI画作</text>
+    </view>
+  </view>
+</view>

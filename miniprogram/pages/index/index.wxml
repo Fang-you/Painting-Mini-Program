@@ -1,28 +1,70 @@
 <!--index.wxml-->
-<scroll-view class="scrollarea" scroll-y type="list">
-  <view class="container">
-    <view class="userinfo">
-      <block wx:if="{{canIUseNicknameComp && !hasUserInfo}}">
-        <button class="avatar-wrapper" open-type="chooseAvatar" bind:chooseavatar="onChooseAvatar">
-          <image class="avatar" src="{{userInfo.avatarUrl}}"></image>
-        </button>
-        <view class="nickname-wrapper">
-          <text class="nickname-label">昵称</text>
-          <input type="nickname" class="nickname-input" placeholder="请输入昵称" bind:change="onInputChange" />
-        </view>
-      </block>
-      <block wx:elif="{{!hasUserInfo}}">
-        <button wx:if="{{canIUseGetUserProfile}}" bindtap="getUserProfile"> 获取头像昵称 </button>
-        <view wx:else> 请使用2.10.4及以上版本基础库 </view>
-      </block>
-      <block wx:else>
-        <image bindtap="bindViewTap" class="userinfo-avatar" src="{{userInfo.avatarUrl}}" mode="cover"></image>
-        <text class="userinfo-nickname">{{userInfo.nickName}}</text>
-      </block>
+<view class="page-container">
+  <!-- 瀑布流画作列表 -->
+  <scroll-view 
+    class="scroll-area" 
+    scroll-y 
+    enhanced 
+    show-scrollbar="{{false}}"
+    bindscrolltolower="onLoadMore"
+  >
+    <view class="masonry">
+      <!-- 左列 -->
+      <view class="masonry-column">
+        <block wx:for="{{leftColumn}}" wx:key="id">
+          <view class="card" bindtap="onCardTap" data-id="{{item.id}}">
+            <image 
+              class="card-image" 
+              src="{{item.imageUrl}}" 
+              mode="widthFix"
+              lazy-load
+            />
+            <view class="card-info">
+              <view class="author-info">
+                <view class="avatar" style="background: {{item.avatarColor}};"></view>
+                <text class="author-name">{{item.authorName}}</text>
+              </view>
+              <view class="like-info">
+                <t-icon name="heart" size="32rpx" color="#a6a6a6" />
+                <text class="like-count">{{item.likeCount}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+      <!-- 右列 -->
+      <view class="masonry-column">
+        <block wx:for="{{rightColumn}}" wx:key="id">
+          <view class="card" bindtap="onCardTap" data-id="{{item.id}}">
+            <image 
+              class="card-image" 
+              src="{{item.imageUrl}}" 
+              mode="widthFix"
+              lazy-load
+            />
+            <view class="card-info">
+              <view class="author-info">
+                <view class="avatar" style="background: {{item.avatarColor}};"></view>
+                <text class="author-name">{{item.authorName}}</text>
+              </view>
+              <view class="like-info">
+                <t-icon name="heart" size="32rpx" color="#a6a6a6" />
+                <text class="like-count">{{item.likeCount}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
     </view>
-    <view class="usermotto">
-      <text class="user-motto">{{motto}}</text>
+    
+    <!-- 加载更多 -->
+    <view class="loading-more" wx:if="{{isLoading}}">
+      <t-loading theme="circular" size="40rpx" text="加载中..." />
     </view>
+  </scroll-view>
+
+  <!-- 悬浮按钮 -->
+  <view class="fab-button" bindtap="onCreateTap">
+    <t-icon name="add" size="56rpx" color="#ffffff" />
   </view>
- 
-</scroll-view>
+</view>

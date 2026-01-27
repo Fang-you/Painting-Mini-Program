@@ -2,9 +2,10 @@
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",
     "t-icon": "tdesign-miniprogram/icon/icon",
-    "t-loading": "tdesign-miniprogram/loading/loading"
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-textarea": "tdesign-miniprogram/textarea/textarea"
   },
-  "navigationBarTitleText": "AI画画",
+  "navigationBarTitleText": "创建图片",
   "navigationBarBackgroundColor": "#667eea",
   "navigationBarTextStyle": "white"
 }

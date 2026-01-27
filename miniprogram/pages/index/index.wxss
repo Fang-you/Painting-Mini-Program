@@ -1,62 +1,105 @@
 /**index.wxss**/
 page {
   height: 100vh;
-  display: flex;
-  flex-direction: column;
+  background-color: #f5f5f5;
 }
-.scrollarea {
+
+.page-container {
+  height: 100vh;
+  position: relative;
+}
+
+.scroll-area {
+  height: 100%;
+  padding: 16rpx;
+  box-sizing: border-box;
+}
+
+/* 瀑布流布局 */
+.masonry {
+  display: flex;
+  gap: 16rpx;
+}
+
+.masonry-column {
   flex: 1;
-  overflow-y: hidden;
-}
-
-.userinfo {
   display: flex;
   flex-direction: column;
-  align-items: center;
-  color: #aaa;
-  width: 80%;
+  gap: 16rpx;
 }
 
-.userinfo-avatar {
+/* 卡片样式 */
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
   overflow: hidden;
-  width: 128rpx;
-  height: 128rpx;
-  margin: 20rpx;
-  border-radius: 50%;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
 }
 
-.usermotto {
-  margin-top: 200px;
+.card-image {
+  width: 100%;
+  display: block;
 }
 
-.avatar-wrapper {
-  padding: 0;
-  width: 56px !important;
-  border-radius: 8px;
-  margin-top: 40px;
-  margin-bottom: 40px;
+.card-info {
+  padding: 20rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
 }
 
 .avatar {
-  display: block;
-  width: 56px;
-  height: 56px;
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
 }
 
-.nickname-wrapper {
+.author-name {
+  font-size: 24rpx;
+  color: #8b8b8b;
+}
+
+.like-info {
   display: flex;
-  width: 100%;
-  padding: 16px;
-  box-sizing: border-box;
-  border-top: .5px solid rgba(0, 0, 0, 0.1);
-  border-bottom: .5px solid rgba(0, 0, 0, 0.1);
-  color: black;
+  align-items: center;
+  gap: 8rpx;
 }
 
-.nickname-label {
-  width: 105px;
+.like-count {
+  font-size: 24rpx;
+  color: #a6a6a6;
 }
 
-.nickname-input {
-  flex: 1;
+/* 加载更多 */
+.loading-more {
+  padding: 32rpx 0 120rpx;
+  display: flex;
+  justify-content: center;
+}
+
+/* 悬浮按钮 */
+.fab-button {
+  position: fixed;
+  right: 32rpx;
+  bottom: 200rpx;
+  width: 112rpx;
+  height: 112rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.fab-button:active {
+  transform: scale(0.95);
+  opacity: 0.9;
 }

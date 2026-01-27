@@ -1,0 +1,74 @@
+<!--create.wxml-->
+<view class="page-container">
+  <!-- 提示词输入区 -->
+  <view class="input-section">
+    <view class="section-title">描述你想画的画面</view>
+    <t-textarea
+      t-class="prompt-textarea"
+      value="{{prompt}}"
+      placeholder="请输入你想画的画面描述&#10;例如：夕阳下的赛博城市，霓虹灯，未来风"
+      maxlength="500"
+      indicator
+      bind:change="onPromptChange"
+    />
+  </view>
+
+  <!-- 生成按钮 -->
+  <t-button 
+    theme="primary" 
+    size="large" 
+    block 
+    class="generate-btn"
+    loading="{{isGenerating}}"
+    disabled="{{!prompt || isGenerating}}"
+    bind:tap="onGenerate"
+  >
+    <t-icon wx:if="{{!isGenerating}}" name="sparkles" size="40rpx" />
+    {{isGenerating ? 'AI正在作画中...' : '生成图片'}}
+  </t-button>
+
+  <!-- 加载状态 -->
+  <view class="loading-section" wx:if="{{isGenerating}}">
+    <view class="loading-card">
+      <t-loading theme="circular" size="80rpx" />
+      <text class="loading-text">AI正在作画中…</text>
+      <text class="loading-tip">预计需要10-30秒</text>
+    </view>
+  </view>
+
+  <!-- 生成结果区 -->
+  <view class="result-section" wx:if="{{generatedImage}}">
+    <view class="result-header">
+      <text class="result-title">生成结果</text>
+      <view class="ai-tag">AI生成</view>
+    </view>
+    
+    <!-- 大图预览 -->
+    <view class="image-preview">
+      <image 
+        class="generated-image" 
+        src="{{generatedImage}}" 
+        mode="aspectFit"
+        bindtap="onPreviewImage"
+      />
+    </view>
+    
+    <!-- 提示词显示 -->
+    <view class="prompt-display">
+      <text class="prompt-label">提示词</text>
+      <text class="prompt-text">{{generatedPrompt}}</text>
+    </view>
+    
+    <!-- 发布按钮 -->
+    <t-button 
+      theme="primary" 
+      size="large" 
+      block 
+      class="publish-btn"
+      bind:tap="onPublish"
+    >
+      <t-icon name="upload" size="40rpx" />
+      发布到广场
+    </t-button>
+  </view>
+</view>
