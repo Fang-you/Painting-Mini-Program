@@ -6,12 +6,18 @@
     <block wx:if="{{isLoggedIn}}">
       <view class="user-info">
         <view class="avatar-wrapper">
-          <view class="avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-            <text class="avatar-text">{{userInfo.nickName[0] || '用'}}</text>
-          </view>
+          <button class="avatar-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
+            <view class="avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
+              <image wx:if="{{userInfo.avatarUrl}}" class="avatar-image" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
+              <text wx:else class="avatar-text">{{userInfo.nickName[0] || '用'}}</text>
+            </view>
+          </button>
         </view>
         <view class="user-detail">
-          <text class="nickname">{{userInfo.nickName}}</text>
+          <view class="nickname-row" bindtap="onNicknameTap">
+            <text class="nickname">{{userInfo.nickName}}</text>
+            <t-icon name="edit" size="32rpx" color="#a6a6a6" />
+          </view>
           <text class="work-count">已创作 {{artworks.length}} 幅作品</text>
         </view>
         <view class="settings-btn" bindtap="onSettingsTap">
@@ -86,5 +92,36 @@
       <text class="empty-title">请登录查看您的个人画廊</text>
       <text class="empty-tip">登录后即可查看和管理您创作的所有AI画作</text>
     </view>
+
+    <!-- 发布入口：放在“我的”页 -->
+    <view class="publish-entry" wx:if="{{isLoggedIn}}">
+      <t-button
+        theme="primary"
+        size="large"
+        block
+        t-class="publish-entry-btn"
+        bindtap="onPublishFromProfile"
+      >
+        <t-icon name="upload" size="40rpx" />
+        发布新作品
+      </t-button>
+    </view>
   </view>
+
+  <t-popup visible="{{showNicknamePopup}}" placement="bottom" bind:close="onNicknamePopupClose">
+    <view class="popup-content">
+      <view class="popup-title">修改用户名</view>
+      <t-input
+        value="{{editingNickName}}"
+        placeholder="请输入用户名"
+        maxlength="20"
+        clearable
+        bind:change="onNicknameInputChange"
+      />
+      <view class="popup-actions">
+        <t-button theme="default" block t-class="popup-btn" bindtap="onNicknameCancel">取消</t-button>
+        <t-button theme="primary" block t-class="popup-btn" loading="{{isUpdatingNickName}}" disabled="{{!editingNickName}}" bindtap="onNicknameConfirm">保存</t-button>
+      </view>
+    </view>
+  </t-popup>
 </view>

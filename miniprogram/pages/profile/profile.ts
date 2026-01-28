@@ -13,6 +13,12 @@ type CachedUser = {
   avatarUrl: string;
 }
 
+function randomCloudPath(prefix: string) {
+  const ts = Date.now()
+  const rnd = Math.random().toString(16).slice(2)
+  return `${prefix}/${ts}-${rnd}.png`
+}
+
 Component({
   data: {
     isLoggedIn: false,
@@ -23,6 +29,9 @@ Component({
     openid: '',
     userId: '',
     artworks: [] as Artwork[],
+    showNicknamePopup: false,
+    editingNickName: '',
+    isUpdatingNickName: false,
   },
 
   lifetimes: {
@@ -63,6 +72,134 @@ Component({
       }
 
       this.setData({ artworks })
+    },
+
+    onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
+      if (!this.data.isLoggedIn) {
+        wx.showToast({
+          title: '请先登录',
+          icon: 'none',
+        })
+        return
+      }
+
+      const avatarUrl = (e.detail && (e.detail as any).avatarUrl) ? (e.detail as any).avatarUrl : ''
+      if (!avatarUrl) return
+
+      if (!wx.cloud) {
+        wx.showToast({
+          title: '云开发未初始化',
+          icon: 'none',
+        })
+        return
+      }
+
+      wx.showLoading({ title: '更新头像中...' })
+
+      wx.cloud.uploadFile({
+        cloudPath: randomCloudPath('avatars'),
+        filePath: avatarUrl,
+      }).then((uploadRes) => {
+        return wx.cloud.callFunction({
+          name: 'updateUserProfile',
+          data: {
+            avatarUrl: uploadRes.fileID,
+          },
+        }).then(() => uploadRes.fileID)
+      }).then((fileID) => {
+        wx.hideLoading()
+        this.setData({
+          userInfo: {
+            ...this.data.userInfo,
+            avatarUrl: fileID,
+          },
+        })
+
+        const cached = wx.getStorageSync(STORAGE_KEY) as CachedUser | ''
+        if (cached && typeof cached === 'object') {
+          wx.setStorageSync(STORAGE_KEY, {
+            ...cached,
+            avatarUrl: fileID,
+          } as CachedUser)
+        }
+
+        wx.showToast({
+          title: '头像已更新',
+          icon: 'success',
+        })
+      }).catch((err: any) => {
+        console.error('update avatar error', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: err?.errMsg || '更新失败',
+          icon: 'none',
+        })
+      })
+    },
+
+    onNicknameTap() {
+      if (!this.data.isLoggedIn) return
+      this.setData({
+        showNicknamePopup: true,
+        editingNickName: this.data.userInfo.nickName || '',
+      })
+    },
+
+    onNicknamePopupClose() {
+      this.setData({ showNicknamePopup: false })
+    },
+
+    onNicknameInputChange(e: WechatMiniprogram.CustomEvent) {
+      this.setData({ editingNickName: e.detail.value })
+    },
+
+    onNicknameCancel() {
+      this.setData({ showNicknamePopup: false })
+    },
+
+    onNicknameConfirm() {
+      const nickName = (this.data.editingNickName || '').trim()
+      if (!nickName) {
+        wx.showToast({ title: '请输入用户名', icon: 'none' })
+        return
+      }
+
+      if (!wx.cloud) {
+        wx.showToast({ title: '云开发未初始化', icon: 'none' })
+        return
+      }
+
+      this.setData({ isUpdatingNickName: true })
+
+      wx.cloud.callFunction({
+        name: 'updateUserProfile',
+        data: {
+          nickName,
+        },
+      }).then(() => {
+        this.setData({
+          isUpdatingNickName: false,
+          showNicknamePopup: false,
+          userInfo: {
+            ...this.data.userInfo,
+            nickName,
+          },
+        })
+
+        const cached = wx.getStorageSync(STORAGE_KEY) as CachedUser | ''
+        if (cached && typeof cached === 'object') {
+          wx.setStorageSync(STORAGE_KEY, {
+            ...cached,
+            nickName,
+          } as CachedUser)
+        }
+
+        wx.showToast({ title: '已保存', icon: 'success' })
+      }).catch((err: any) => {
+        console.error('update nickname error', err)
+        this.setData({ isUpdatingNickName: false })
+        wx.showToast({ title: err?.errMsg || '保存失败', icon: 'none' })
+      })
     },
 
     onWechatLogin() {
@@ -166,6 +303,12 @@ Component({
     },
 
     onCreateTap() {
+      wx.navigateTo({
+        url: '/pages/create/create',
+      })
+    },
+
+    onPublishFromProfile() {
       wx.navigateTo({
         url: '/pages/create/create',
       })

@@ -10,52 +10,52 @@ exports.main = async (event, context) => {
   const users = db.collection('users')
 
   const openid = wxContext.OPENID
+  const avatarUrl = (event && event.avatarUrl) ? event.avatarUrl : ''
+  const nickName = (event && event.nickName) ? event.nickName : ''
 
-  const inputUserInfo = (event && event.userInfo) ? event.userInfo : {}
-  const nickName = inputUserInfo.nickName || ''
-  const avatarUrl = inputUserInfo.avatarUrl || ''
+  try {
+    await db.createCollection('users')
+  } catch (e) {
+    // ignore
+  }
 
-  const existRes = await users.where({ openid }).limit(1).get()
   const now = db.serverDate()
+
+  const existRes = await users.where({ openid }).limit(1).get().catch((e) => {
+    const msg = (e && (e.errMsg || e.message)) ? (e.errMsg || e.message) : ''
+    const isCollectionNotExist = e && (e.errCode === -502005 || /collection.*not exists|Db or Table not exist/i.test(msg))
+    if (!isCollectionNotExist) throw e
+    return { data: [] }
+  })
 
   if (existRes.data && existRes.data.length > 0) {
     const userDoc = existRes.data[0]
     await users.doc(userDoc._id).update({
       data: {
-        nickName,
-        avatarUrl,
+        avatarUrl: avatarUrl || userDoc.avatarUrl || '',
+        nickName: nickName || userDoc.nickName || '',
         updatedAt: now,
       },
     })
 
     return {
-      openid,
+      ok: true,
       userId: userDoc._id,
-      isNew: false,
-      user: {
-        nickName: nickName || userDoc.nickName || '',
-        avatarUrl: avatarUrl || userDoc.avatarUrl || '',
-      },
     }
   }
 
   const addRes = await users.add({
     data: {
       openid,
-      nickName,
       avatarUrl,
+      nickName,
       createdAt: now,
       updatedAt: now,
     },
   })
 
   return {
-    openid,
+    ok: true,
     userId: addRes._id,
-    isNew: true,
-    user: {
-      nickName,
-      avatarUrl,
-    },
   }
 }

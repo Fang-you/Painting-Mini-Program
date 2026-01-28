@@ -18,10 +18,10 @@
     theme="primary" 
     size="large" 
     block 
-    class="generate-btn"
+    t-class="generate-btn"
     loading="{{isGenerating}}"
     disabled="{{!prompt || isGenerating}}"
-    bind:tap="onGenerate"
+    bindtap="onGenerate"
   >
     <t-icon wx:if="{{!isGenerating}}" name="sparkles" size="40rpx" />
     {{isGenerating ? 'AI正在作画中...' : '生成图片'}}
@@ -64,8 +64,8 @@
       theme="primary" 
       size="large" 
       block 
-      class="publish-btn"
-      bind:tap="onPublish"
+      t-class="publish-btn"
+      bindtap="onPublish"
     >
       <t-icon name="upload" size="40rpx" />
       发布到广场
