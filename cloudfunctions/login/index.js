@@ -20,10 +20,10 @@ exports.main = async (event, context) => {
 
   if (existRes.data && existRes.data.length > 0) {
     const userDoc = existRes.data[0]
+    
+    // 只更新登录时间，不覆盖已保存的头像和用户名
     await users.doc(userDoc._id).update({
       data: {
-        nickName,
-        avatarUrl,
         updatedAt: now,
       },
     })
@@ -33,8 +33,9 @@ exports.main = async (event, context) => {
       userId: userDoc._id,
       isNew: false,
       user: {
-        nickName: nickName || userDoc.nickName || '',
-        avatarUrl: avatarUrl || userDoc.avatarUrl || '',
+        // 优先返回数据库中已保存的值
+        nickName: userDoc.nickName || nickName || '',
+        avatarUrl: userDoc.avatarUrl || avatarUrl || '',
       },
     }
   }

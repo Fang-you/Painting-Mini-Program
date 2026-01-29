@@ -1,7 +1,11 @@
 // profile.ts
+export {}
+
 interface Artwork {
   id: string;
   imageUrl: string;
+  likeCount: number;
+  index: number;
 }
 
 const STORAGE_KEY = 'AI_DRAW_USER'
@@ -29,6 +33,9 @@ Component({
     openid: '',
     userId: '',
     artworks: [] as Artwork[],
+    leftColumn: [] as Artwork[],
+    rightColumn: [] as Artwork[],
+    lastRefresh: 0,
     showNicknamePopup: false,
     editingNickName: '',
     isUpdatingNickName: false,
@@ -47,7 +54,7 @@ Component({
           openid: cached.openid || '',
           userId: cached.userId || '',
         })
-        this.loadUserData()
+        this.loadUserArtworks()
       }
     },
   },
@@ -57,21 +64,60 @@ Component({
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().setData({ selected: 1 })
       }
+
+      if (!this.data.isLoggedIn) return
+      const refresh = wx.getStorageSync('ARTWORKS_REFRESH') || 0
+      if (refresh && refresh !== this.data.lastRefresh) {
+        this.setData({ lastRefresh: refresh })
+      }
+
+      this.loadUserArtworks()
     },
   },
 
   methods: {
-    loadUserData() {
-      // 模拟加载用户数据
-      const artworks: Artwork[] = []
-      for (let i = 0; i < 12; i++) {
-        artworks.push({
-          id: `artwork-${i}`,
-          imageUrl: `https://picsum.photos/200/200?random=${20 + i}`,
-        })
+    loadUserArtworks() {
+      if (!this.data.isLoggedIn) {
+        this.setData({ artworks: [], leftColumn: [], rightColumn: [] })
+        return
+      }
+      if (!wx.cloud) {
+        wx.showToast({ title: '云开发未初始化', icon: 'none' })
+        return
       }
 
-      this.setData({ artworks })
+      wx.cloud.callFunction({
+        name: 'artworks',
+        data: {
+          action: 'listUser',
+          page: 1,
+          pageSize: 50,
+        },
+      }).then((res: any) => {
+        const result = res?.result || {}
+        const list = (result.list || []) as any[]
+        const artworks: Artwork[] = list.map((item, index) => ({
+          id: item._id,
+          imageUrl: item.imageUrl,
+          likeCount: Number(item.likeCount || 0),
+          index,
+        }))
+
+        const leftColumn: Artwork[] = []
+        const rightColumn: Artwork[] = []
+        artworks.forEach((item, i) => {
+          if (i % 2 === 0) {
+            leftColumn.push(item)
+          } else {
+            rightColumn.push(item)
+          }
+        })
+
+        this.setData({ artworks, leftColumn, rightColumn })
+      }).catch((err: any) => {
+        console.error('load user artworks error', err)
+        wx.showToast({ title: err?.errMsg || '加载失败', icon: 'none' })
+      })
     },
 
     onChooseAvatar(e: WechatMiniprogram.CustomEvent) {
@@ -245,7 +291,7 @@ Component({
               avatarUrl,
             } as CachedUser)
 
-            this.loadUserData()
+            this.loadUserArtworks()
             wx.showToast({
               title: result?.isNew ? '注册成功' : '登录成功',
               icon: 'success',
@@ -295,10 +341,81 @@ Component({
 
     onArtworkTap(e: WechatMiniprogram.TouchEvent) {
       const index = e.currentTarget.dataset.index
-      const urls = this.data.artworks.map((item) => item.imageUrl)
-      wx.previewImage({
-        urls,
-        current: urls[index],
+      const artwork = this.data.artworks[index]
+      if (!artwork) return
+
+      wx.showActionSheet({
+        itemList: ['预览图片', '删除画作'],
+        success: (res) => {
+          if (res.tapIndex === 0) {
+            // 预览图片
+            const urls = this.data.artworks.map((item) => item.imageUrl)
+            wx.previewImage({
+              urls,
+              current: urls[index],
+            })
+          } else if (res.tapIndex === 1) {
+            // 删除画作
+            this.deleteArtwork(artwork.id, index)
+          }
+        },
+      })
+    },
+
+    deleteArtwork(artworkId: string, index: number) {
+      wx.showModal({
+        title: '确认删除',
+        content: '删除后无法恢复，确定要删除这幅画作吗？',
+        confirmColor: '#e74c3c',
+        success: (res) => {
+          if (!res.confirm) return
+
+          if (!wx.cloud) {
+            wx.showToast({ title: '云开发未初始化', icon: 'none' })
+            return
+          }
+
+          wx.showLoading({ title: '删除中...' })
+
+          wx.cloud.callFunction({
+            name: 'artworks',
+            data: {
+              action: 'delete',
+              artworkId,
+            },
+          }).then((callRes: any) => {
+            wx.hideLoading()
+            const result = callRes?.result || {}
+            if (!result.ok) {
+              wx.showToast({ title: result.errMsg || '删除失败', icon: 'none' })
+              return
+            }
+
+            // 从本地列表移除
+            const artworks = this.data.artworks.filter((_, i) => i !== index)
+            const leftColumn: Artwork[] = []
+            const rightColumn: Artwork[] = []
+            artworks.forEach((item, i) => {
+              const newItem = { ...item, index: i }
+              if (i % 2 === 0) {
+                leftColumn.push(newItem)
+              } else {
+                rightColumn.push(newItem)
+              }
+            })
+
+            this.setData({ artworks, leftColumn, rightColumn })
+
+            // 设置刷新标记，让首页也刷新
+            wx.setStorageSync('ARTWORKS_REFRESH', Date.now())
+
+            wx.showToast({ title: '已删除', icon: 'success' })
+          }).catch((err: any) => {
+            console.error('delete artwork error', err)
+            wx.hideLoading()
+            wx.showToast({ title: err?.errMsg || '删除失败', icon: 'none' })
+          })
+        },
       })
     },
 

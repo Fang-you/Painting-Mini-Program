@@ -1,5 +1,22 @@
 <!--create.wxml-->
 <view class="page-container">
+  <!-- 风格标签区 -->
+  <view class="style-section">
+    <view class="section-title">选择风格</view>
+    <view class="style-tags">
+      <block wx:for="{{styleTags}}" wx:key="value">
+        <t-tag 
+          theme="{{item.selected ? 'primary' : 'default'}}"
+          variant="{{item.selected ? 'dark' : 'outline'}}"
+          size="large"
+          t-class="style-tag {{item.selected ? 'style-tag-active' : ''}}"
+          bindtap="onStyleTagTap"
+          data-value="{{item.value}}"
+        >{{item.label}}</t-tag>
+      </block>
+    </view>
+  </view>
+
   <!-- 提示词输入区 -->
   <view class="input-section">
     <view class="section-title">描述你想画的画面</view>
@@ -23,8 +40,7 @@
     disabled="{{!prompt || isGenerating}}"
     bindtap="onGenerate"
   >
-    <t-icon wx:if="{{!isGenerating}}" name="sparkles" size="40rpx" />
-    {{isGenerating ? 'AI正在作画中...' : '生成图片'}}
+    {{isGenerating ? 'AI正在作画中...' : (generatedImage ? '重新生成' : '生成图片')}}
   </t-button>
 
   <!-- 加载状态 -->
@@ -58,17 +74,5 @@
       <text class="prompt-label">提示词</text>
       <text class="prompt-text">{{generatedPrompt}}</text>
     </view>
-    
-    <!-- 发布按钮 -->
-    <t-button 
-      theme="primary" 
-      size="large" 
-      block 
-      t-class="publish-btn"
-      bindtap="onPublish"
-    >
-      <t-icon name="upload" size="40rpx" />
-      发布到广场
-    </t-button>
   </view>
 </view>

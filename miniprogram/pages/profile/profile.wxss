@@ -128,6 +128,74 @@ page {
   padding: 32rpx;
 }
 
+/* 个人画廊瀑布流（与首页一致） */
+.gallery-masonry {
+  display: flex;
+  gap: 16rpx;
+}
+
+.gallery-column {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16rpx;
+}
+
+.card {
+  background: #ffffff;
+  border-radius: 24rpx;
+  overflow: hidden;
+  box-shadow: 0 2rpx 8rpx rgba(0, 0, 0, 0.04);
+}
+
+.card-image {
+  width: 100%;
+  display: block;
+}
+
+.card-info {
+  padding: 20rpx 24rpx;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.author-info {
+  display: flex;
+  align-items: center;
+  gap: 12rpx;
+}
+
+.author-avatar {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: #eeeeee;
+}
+
+.author-avatar-placeholder {
+  width: 48rpx;
+  height: 48rpx;
+  border-radius: 50%;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+}
+
+.author-name {
+  font-size: 24rpx;
+  color: #8b8b8b;
+}
+
+.like-info {
+  display: flex;
+  align-items: center;
+  gap: 8rpx;
+}
+
+.like-count {
+  font-size: 24rpx;
+  color: #a6a6a6;
+}
+
 .gallery-header {
   display: flex;
   align-items: center;
@@ -211,11 +279,14 @@ page {
 }
 
 .publish-entry-btn {
-  --td-button-primary-bg-color: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  --td-button-primary-border-color: transparent;
-  --td-button-border-radius: 24rpx;
-  --td-button-large-height: 96rpx;
-  --td-button-large-font-size: 32rpx;
+  --td-button-primary-bg-color: #667eea !important;
+  --td-button-primary-border-color: #667eea !important;
+  --td-button-border-radius: 48rpx;
+  --td-button-large-height: 100rpx;
+  --td-button-large-font-size: 34rpx;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%) !important;
+  border: none !important;
+  box-shadow: 0 8rpx 24rpx rgba(102, 126, 234, 0.4);
 }
 
 .popup-content {

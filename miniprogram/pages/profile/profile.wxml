@@ -7,10 +7,15 @@
       <view class="user-info">
         <view class="avatar-wrapper">
           <button class="avatar-button" open-type="chooseAvatar" bindchooseavatar="onChooseAvatar">
-            <view class="avatar" style="background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);">
-              <image wx:if="{{userInfo.avatarUrl}}" class="avatar-image" src="{{userInfo.avatarUrl}}" mode="aspectFill" />
-              <text wx:else class="avatar-text">{{userInfo.nickName[0] || '用'}}</text>
-            </view>
+            <t-avatar 
+              wx:if="{{userInfo.avatarUrl}}" 
+              image="{{userInfo.avatarUrl}}" 
+              size="128rpx" 
+            />
+            <t-avatar 
+              wx:else 
+              size="128rpx"
+            >{{userInfo.nickName[0] || '用'}}</t-avatar>
           </button>
         </view>
         <view class="user-detail">
@@ -55,15 +60,44 @@
     </view>
 
     <!-- 已登录且有作品 -->
-    <view class="gallery-grid" wx:if="{{isLoggedIn && artworks.length > 0}}">
-      <view 
-        class="gallery-item" 
-        wx:for="{{artworks}}" 
-        wx:key="id"
-        bindtap="onArtworkTap"
-        data-index="{{index}}"
-      >
-        <image class="gallery-image" src="{{item.imageUrl}}" mode="aspectFill" lazy-load />
+    <view class="gallery-masonry" wx:if="{{isLoggedIn && artworks.length > 0}}">
+      <!-- 左列 -->
+      <view class="gallery-column">
+        <block wx:for="{{leftColumn}}" wx:key="id">
+          <view class="card" bindtap="onArtworkTap" data-index="{{item.index}}">
+            <t-image class="card-image" src="{{item.imageUrl}}" mode="widthFix" lazy />
+            <view class="card-info">
+              <view class="author-info">
+                <t-avatar wx:if="{{userInfo.avatarUrl}}" image="{{userInfo.avatarUrl}}" size="48rpx" />
+                <t-avatar wx:else icon="user" size="48rpx" />
+                <text class="author-name">{{userInfo.nickName}}</text>
+              </view>
+              <view class="like-info">
+                <t-icon name="heart" size="32rpx" color="#a6a6a6" />
+                <text class="like-count">{{item.likeCount}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
+      </view>
+      <!-- 右列 -->
+      <view class="gallery-column">
+        <block wx:for="{{rightColumn}}" wx:key="id">
+          <view class="card" bindtap="onArtworkTap" data-index="{{item.index}}">
+            <t-image class="card-image" src="{{item.imageUrl}}" mode="widthFix" lazy />
+            <view class="card-info">
+              <view class="author-info">
+                <t-avatar wx:if="{{userInfo.avatarUrl}}" image="{{userInfo.avatarUrl}}" size="48rpx" />
+                <t-avatar wx:else icon="user" size="48rpx" />
+                <text class="author-name">{{userInfo.nickName}}</text>
+              </view>
+              <view class="like-info">
+                <t-icon name="heart" size="32rpx" color="#a6a6a6" />
+                <text class="like-count">{{item.likeCount}}</text>
+              </view>
+            </view>
+          </view>
+        </block>
       </view>
     </view>
 
@@ -101,10 +135,7 @@
         block
         t-class="publish-entry-btn"
         bindtap="onPublishFromProfile"
-      >
-        <t-icon name="upload" size="40rpx" />
-        发布新作品
-      </t-button>
+      >发布新作品</t-button>
     </view>
   </view>
 

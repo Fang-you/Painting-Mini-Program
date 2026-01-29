@@ -1,34 +1,31 @@
 // index.ts
-const avatarColors = [
-  'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
-  'linear-gradient(135deg, #f093fb 0%, #f5576c 100%)',
-  'linear-gradient(135deg, #4facfe 0%, #00f2fe 100%)',
-  'linear-gradient(135deg, #43e97b 0%, #38f9d7 100%)',
-  'linear-gradient(135deg, #fa709a 0%, #fee140 100%)',
-  'linear-gradient(135deg, #a8edea 0%, #fed6e3 100%)',
-]
-
-const authorNames = ['小明', '艺术家', '创意达人', '画画爱好者', '梦想家', '设计师小王', 'AI大师', '灵感捕手']
+export {}
 
 interface ArtworkItem {
   id: string;
   imageUrl: string;
   authorName: string;
-  avatarColor: string;
+  avatarUrl: string;
   likeCount: number;
+  prompt: string;
 }
 
 Component({
   data: {
-    leftColumn: [] as ArtworkItem[],
-    rightColumn: [] as ArtworkItem[],
+    artworks: [] as ArtworkItem[],
     isLoading: false,
     page: 1,
+    pageSize: 20,
+    hasMore: true,
+    hasArtworks: false,
+    lastRefresh: 0,
+    showDetailPopup: false,
+    detailArtwork: {} as ArtworkItem,
   },
 
   lifetimes: {
     attached() {
-      this.loadArtworks()
+      this.loadArtworks(true)
     },
   },
 
@@ -37,57 +34,96 @@ Component({
       if (typeof this.getTabBar === 'function' && this.getTabBar()) {
         this.getTabBar().setData({ selected: 0 })
       }
+
+      const refresh = wx.getStorageSync('ARTWORKS_REFRESH') || 0
+      if (refresh && refresh !== this.data.lastRefresh) {
+        this.setData({ lastRefresh: refresh })
+        this.loadArtworks(true)
+      }
     },
   },
 
   methods: {
-    loadArtworks() {
-      const { page, leftColumn, rightColumn } = this.data
+    loadArtworks(reset = false) {
+      if (!wx.cloud) {
+        this.setData({ isLoading: false, hasMore: false, hasArtworks: false, artworks: [] })
+        return
+      }
+
+      const { page, pageSize, artworks } = this.data
+      const currentPage = reset ? 1 : page
+
       this.setData({ isLoading: true })
 
-      // 模拟加载数据
-      setTimeout(() => {
-        const newItems: ArtworkItem[] = []
-        for (let i = 0; i < 6; i++) {
-          const id = `${page}-${i}`
-          newItems.push({
-            id,
-            imageUrl: `https://picsum.photos/300/${280 + Math.floor(Math.random() * 120)}?random=${page}${i}`,
-            authorName: authorNames[Math.floor(Math.random() * authorNames.length)],
-            avatarColor: avatarColors[Math.floor(Math.random() * avatarColors.length)],
-            likeCount: Math.floor(Math.random() * 500) + 10,
-          })
-        }
+      wx.cloud.callFunction({
+        name: 'artworks',
+        data: {
+          action: 'list',
+          page: currentPage,
+          pageSize,
+        },
+      }).then((res: any) => {
+        const result = res?.result || {}
+        const list = (result.list || []) as any[]
 
-        // 分配到左右两列
-        const newLeft = [...leftColumn]
-        const newRight = [...rightColumn]
-        newItems.forEach((item, index) => {
-          if (index % 2 === 0) {
-            newLeft.push(item)
-          } else {
-            newRight.push(item)
-          }
-        })
+        const mapped: ArtworkItem[] = list.map((item) => ({
+          id: item._id,
+          imageUrl: item.imageUrl,
+          authorName: item.authorName || '匿名用户',
+          avatarUrl: item.authorAvatarUrl || '',
+          likeCount: Number(item.likeCount || 0),
+          prompt: item.prompt || '',
+        }))
+
+        const nextArtworks = reset ? mapped : [...artworks, ...mapped]
+        const total = nextArtworks.length
 
         this.setData({
-          leftColumn: newLeft,
-          rightColumn: newRight,
+          artworks: nextArtworks,
           isLoading: false,
-          page: page + 1,
+          page: currentPage + 1,
+          hasMore: !!result.hasMore,
+          hasArtworks: total > 0,
         })
-      }, 500)
+      }).catch((err: any) => {
+        console.error('load artworks error', err)
+        this.setData({ isLoading: false })
+        wx.showToast({
+          title: err?.errMsg || '加载失败',
+          icon: 'none',
+        })
+      })
     },
 
     onLoadMore() {
-      if (!this.data.isLoading) {
-        this.loadArtworks()
+      if (!this.data.isLoading && this.data.hasMore) {
+        this.loadArtworks(false)
       }
     },
 
     onCardTap(e: WechatMiniprogram.TouchEvent) {
       const id = e.currentTarget.dataset.id
-      console.log('点击画作:', id)
+      const artwork = this.data.artworks.find((item) => item.id === id)
+      if (artwork) {
+        this.setData({
+          showDetailPopup: true,
+          detailArtwork: artwork,
+        })
+      }
+    },
+
+    onDetailPopupClose() {
+      this.setData({ showDetailPopup: false })
+    },
+
+    onPreviewDetailImage() {
+      const { detailArtwork } = this.data
+      if (detailArtwork.imageUrl) {
+        wx.previewImage({
+          urls: [detailArtwork.imageUrl],
+          current: detailArtwork.imageUrl,
+        })
+      }
     },
 
     onCreateTap() {

@@ -2,7 +2,11 @@
   "usingComponents": {
     "t-button": "tdesign-miniprogram/button/button",
     "t-icon": "tdesign-miniprogram/icon/icon",
-    "t-loading": "tdesign-miniprogram/loading/loading"
+    "t-loading": "tdesign-miniprogram/loading/loading",
+    "t-fab": "tdesign-miniprogram/fab/fab",
+    "t-image": "tdesign-miniprogram/image/image",
+    "t-avatar": "tdesign-miniprogram/avatar/avatar",
+    "t-popup": "tdesign-miniprogram/popup/popup"
   },
   "navigationBarTitleText": "AI画画",
   "navigationBarBackgroundColor": "#667eea",

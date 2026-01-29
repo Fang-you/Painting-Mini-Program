@@ -3,7 +3,10 @@
     "t-button": "tdesign-miniprogram/button/button",
     "t-icon": "tdesign-miniprogram/icon/icon",
     "t-popup": "tdesign-miniprogram/popup/popup",
-    "t-input": "tdesign-miniprogram/input/input"
+    "t-input": "tdesign-miniprogram/input/input",
+    "t-avatar": "tdesign-miniprogram/avatar/avatar",
+    "t-image": "tdesign-miniprogram/image/image",
+    "t-loading": "tdesign-miniprogram/loading/loading"
   },
   "navigationBarTitleText": "我的",
   "navigationBarBackgroundColor": "#667eea",

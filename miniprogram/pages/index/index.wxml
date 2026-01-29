@@ -8,53 +8,34 @@
     show-scrollbar="{{false}}"
     bindscrolltolower="onLoadMore"
   >
-    <view class="masonry">
-      <!-- 左列 -->
-      <view class="masonry-column">
-        <block wx:for="{{leftColumn}}" wx:key="id">
-          <view class="card" bindtap="onCardTap" data-id="{{item.id}}">
-            <image 
-              class="card-image" 
-              src="{{item.imageUrl}}" 
-              mode="widthFix"
-              lazy-load
-            />
-            <view class="card-info">
-              <view class="author-info">
-                <view class="avatar" style="background: {{item.avatarColor}};"></view>
-                <text class="author-name">{{item.authorName}}</text>
-              </view>
-              <view class="like-info">
-                <t-icon name="heart" size="32rpx" color="#a6a6a6" />
-                <text class="like-count">{{item.likeCount}}</text>
-              </view>
+    <view class="empty-state" wx:if="{{!hasArtworks && !isLoading}}">
+      <t-icon name="image" size="96rpx" color="#c5c5c5" />
+      <text class="empty-title">暂无画作</text>
+      <text class="empty-tip">快去发布你的第一幅AI画作吧</text>
+    </view>
+
+    <view class="grid" wx:if="{{hasArtworks}}">
+      <block wx:for="{{artworks}}" wx:key="id">
+        <view class="card" bindtap="onCardTap" data-id="{{item.id}}">
+          <t-image 
+            class="card-image" 
+            src="{{item.imageUrl}}" 
+            mode="widthFix"
+            lazy
+          />
+          <view class="card-info">
+            <view class="author-info">
+              <t-avatar wx:if="{{item.avatarUrl}}" image="{{item.avatarUrl}}" size="48rpx" />
+              <t-avatar wx:else icon="user" size="48rpx" />
+              <text class="author-name">{{item.authorName}}</text>
+            </view>
+            <view class="like-info">
+              <t-icon name="heart" size="32rpx" color="#a6a6a6" />
+              <text class="like-count">{{item.likeCount}}</text>
             </view>
           </view>
-        </block>
-      </view>
-      <!-- 右列 -->
-      <view class="masonry-column">
-        <block wx:for="{{rightColumn}}" wx:key="id">
-          <view class="card" bindtap="onCardTap" data-id="{{item.id}}">
-            <image 
-              class="card-image" 
-              src="{{item.imageUrl}}" 
-              mode="widthFix"
-              lazy-load
-            />
-            <view class="card-info">
-              <view class="author-info">
-                <view class="avatar" style="background: {{item.avatarColor}};"></view>
-                <text class="author-name">{{item.authorName}}</text>
-              </view>
-              <view class="like-info">
-                <t-icon name="heart" size="32rpx" color="#a6a6a6" />
-                <text class="like-count">{{item.likeCount}}</text>
-              </view>
-            </view>
-          </view>
-        </block>
-      </view>
+        </view>
+      </block>
     </view>
     
     <!-- 加载更多 -->
@@ -64,7 +45,29 @@
   </scroll-view>
 
   <!-- 悬浮按钮 -->
-  <view class="fab-button" bindtap="onCreateTap">
-    <t-icon name="add" size="56rpx" color="#ffffff" />
-  </view>
+  <t-fab icon="add" bind:click="onCreateTap" />
+
+  <!-- 画作详情弹窗 -->
+  <t-popup visible="{{showDetailPopup}}" placement="bottom" bind:visible-change="onDetailPopupClose">
+    <view class="detail-popup">
+      <view class="detail-header">
+        <text class="detail-title">画作详情</text>
+        <view class="detail-close" bindtap="onDetailPopupClose">
+          <t-icon name="close" size="40rpx" color="#999" />
+        </view>
+      </view>
+      <view class="detail-image-wrap" bindtap="onPreviewDetailImage">
+        <image class="detail-image" src="{{detailArtwork.imageUrl}}" mode="widthFix" />
+      </view>
+      <view class="detail-author">
+        <t-avatar wx:if="{{detailArtwork.avatarUrl}}" image="{{detailArtwork.avatarUrl}}" size="64rpx" />
+        <t-avatar wx:else icon="user" size="64rpx" />
+        <text class="detail-author-name">{{detailArtwork.authorName || '匿名用户'}}</text>
+      </view>
+      <view class="detail-prompt" wx:if="{{detailArtwork.prompt}}">
+        <text class="detail-prompt-label">提示词</text>
+        <text class="detail-prompt-text">{{detailArtwork.prompt}}</text>
+      </view>
+    </view>
+  </t-popup>
 </view>
