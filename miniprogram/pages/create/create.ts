@@ -1,6 +1,28 @@
 // create.ts
 export {}
 
+function createPageCloudPath(prefix: string) {
+  const ts = Date.now()
+  const rnd = Math.random().toString(16).slice(2)
+  return `${prefix}/${ts}-${rnd}.png`
+}
+
+function downloadToTempFile(url: string): Promise<string> {
+  return new Promise((resolve, reject) => {
+    wx.downloadFile({
+      url,
+      success: (res: WechatMiniprogram.DownloadFileSuccessCallbackResult) => {
+        if (res.statusCode === 200) {
+          resolve(res.tempFilePath)
+        } else {
+          reject(new Error(`download fail: ${res.statusCode}`))
+        }
+      },
+      fail: (err) => reject(err),
+    })
+  })
+}
+
 interface StyleTag {
   label: string;
   value: string;
@@ -203,6 +225,87 @@ Component({
           current: generatedImage,
         })
       }
+    },
+
+    onPublish() {
+      const { generatedImage, generatedPrompt } = this.data
+      if (!generatedImage) {
+        wx.showToast({
+          title: '请先生成图片',
+          icon: 'none',
+        })
+        return
+      }
+
+      const cached = wx.getStorageSync('AI_DRAW_USER')
+      if (!cached) {
+        wx.showToast({
+          title: '请先登录',
+          icon: 'none',
+        })
+        return
+      }
+
+      if (!wx.cloud) {
+        wx.showToast({
+          title: '云开发未初始化',
+          icon: 'none',
+        })
+        return
+      }
+
+      wx.showLoading({ title: '发布中...' })
+
+      const userInfo = cached as { nickName?: string; avatarUrl?: string }
+      const authorName = userInfo.nickName || ''
+      const authorAvatarUrl = userInfo.avatarUrl || ''
+
+      downloadToTempFile(generatedImage).then((tempFilePath) => {
+        return wx.cloud.uploadFile({
+          cloudPath: createPageCloudPath('artworks'),
+          filePath: tempFilePath,
+        })
+      }).then((uploadRes: any) => {
+        return wx.cloud.callFunction({
+          name: 'artworks',
+          data: {
+            action: 'create',
+            imageFileId: uploadRes.fileID,
+            prompt: generatedPrompt,
+            authorName,
+            authorAvatarUrl,
+          },
+        })
+      }).then((res: any) => {
+        wx.hideLoading()
+        const result = res?.result || {}
+        if (!result.ok) {
+          wx.showToast({
+            title: result.errMsg || '发布失败',
+            icon: 'none',
+          })
+          return
+        }
+
+        wx.setStorageSync('ARTWORKS_REFRESH', Date.now())
+        wx.showToast({
+          title: '发布成功',
+          icon: 'success',
+        })
+
+        setTimeout(() => {
+          wx.switchTab({
+            url: '/pages/index/index',
+          })
+        }, 800)
+      }).catch((err: any) => {
+        console.error('publish artwork error', err)
+        wx.hideLoading()
+        wx.showToast({
+          title: err?.errMsg || err?.message || '发布失败',
+          icon: 'none',
+        })
+      })
     },
   },
 })

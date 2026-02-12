@@ -74,5 +74,13 @@
       <text class="prompt-label">提示词</text>
       <text class="prompt-text">{{generatedPrompt}}</text>
     </view>
+
+    <t-button
+      theme="primary"
+      size="large"
+      block
+      t-class="publish-btn"
+      bindtap="onPublish"
+    >发布到广场</t-button>
   </view>
 </view>
