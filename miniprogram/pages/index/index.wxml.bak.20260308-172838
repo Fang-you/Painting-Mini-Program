@@ -1,5 +1,5 @@
 <!--index.wxml-->
-<view class="page-container" style="position: relative; left: 0rpx; top: 2rpx">
+<view class="page-container">
   <!-- 瀑布流画作列表 -->
   <scroll-view 
     class="scroll-area" 

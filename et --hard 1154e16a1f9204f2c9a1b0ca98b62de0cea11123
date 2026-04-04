@@ -1,0 +1,35 @@
+[33mcommit af9748d4e0e0ddf927b3485866a84abca13765ca[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mfeature_1_init[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/feature_1_init[m[33m, [m[1;32mmain[m[33m)[m
+Author: fang <16002432+fangyou666@user.noreply.gitee.com>
+Date:   Thu Feb 12 20:29:11 2026 +0800
+
+    feature:完成初始页面开发并配置好云函数与登录注册
+
+[33mcommit 1154e16a1f9204f2c9a1b0ca98b62de0cea11123[m
+Author: Fang-you <fangyou@qq.com>
+Date:   Thu Jan 29 22:42:48 2026 +0800
+
+    feat：完成了调用api实现图片生成的功能
+
+[33mcommit 93a853b650d4a027d7b77c77ad27f63b493db078[m
+Author: Fang-you <fangyou@qq.com>
+Date:   Wed Jan 28 22:18:37 2026 +0800
+
+    feat:"更改头像和用户名"
+
+[33mcommit e519614ea432dd6c77bdca28ecf22c995a9028ff[m
+Author: Fang-you <fangyou@qq.com>
+Date:   Wed Jan 28 21:41:17 2026 +0800
+
+    fear:"登录注册的逻辑完善"
+
+[33mcommit 77508ef0b4baf348fc7c89ed55260817a1f3e3ef[m
+Author: Fang-you <fangyou@qq.com>
+Date:   Tue Jan 27 22:03:47 2026 +0800
+
+    feat：完成小程序的前端开发
+
+[33mcommit e0cddfaba3fe82d8cfab7036907073e8678ea6f3[m
+Author: Fang-you <fangyou@qq.com>
+Date:   Tue Jan 27 21:44:23 2026 +0800
+
+    feat:引入TDesign和完成前端的原型图
