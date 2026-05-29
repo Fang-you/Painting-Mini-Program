@@ -41,6 +41,13 @@
 ├── package.json             # 项目依赖
 ├── project.config.json      # 微信开发者工具配置
 └── tsconfig.json            # TypeScript配置
+
+
+
+
+https://github.com/user-attachments/assets/d9f947df-9a49-4e7d-b810-5f5810f9e77c
+
+
 ```
 
 ## 快速开始
