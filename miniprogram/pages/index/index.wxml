@@ -45,7 +45,7 @@
   </scroll-view>
 
   <!-- 悬浮按钮 -->
-  <t-fab icon="add" bind:click="onCreateTap" />
+  <t-fab icon="add" bind:click="onCreateTap" style="right: 32rpx; bottom: 300rpx;" />
 
   <!-- 画作详情弹窗 -->
   <t-popup visible="{{showDetailPopup}}" placement="bottom" bind:visible-change="onDetailPopupClose">

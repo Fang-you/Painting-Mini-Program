@@ -109,7 +109,7 @@ page {
 .fab-button {
   position: fixed;
   right: 32rpx;
-  bottom: 200rpx;
+  bottom: 300rpx;
   width: 112rpx;
   height: 112rpx;
   border-radius: 50%;
