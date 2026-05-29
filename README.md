@@ -42,11 +42,12 @@
 ├── project.config.json      # 微信开发者工具配置
 └── tsconfig.json            # TypeScript配置
 
-
-
-
-
 ```
+
+
+https://github.com/user-attachments/assets/69cfca98-69c3-4526-96cd-8c12fe20383d
+
+
 
 ## 快速开始
 
